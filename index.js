@@ -1,6 +1,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const co = require('co');
 
 function Jack(config) {
   config = !config ? {} : config;
@@ -19,6 +20,21 @@ function Jack(config) {
   });
 }
 
+function processResponse(req, res, rta) {
+  if (rta.toString() === '[object Generator]') {
+    co(rta)
+      .then((p_rta) => {
+        res.status(p_rta.status).json(p_rta.response);
+      })
+      .catch((error) => {
+        res.status(500).json({ message: error.message });
+      })
+      ;
+  } else if (typeof rta === 'function') {
+    res.status(rta.status).json(rta.response);
+  }
+}
+
 function getMethod(fields, cb) {
   return function (req, res) {
     let values = [], idx, field;
@@ -26,8 +42,7 @@ function getMethod(fields, cb) {
       field = fields[idx];
       values[values.length] = req.query[field];
     }
-    const rta = cb.apply(this, values);
-    res.status(rta.status).json(rta.response);
+    processResponse(req, res, cb.apply(this, values));
   };
 }
 
@@ -38,15 +53,13 @@ function postMethod(fields, cb) {
       field = fields[idx];
       values[values.length] = req.body[field];
     }
-    const rta = cb.apply(this, values);
-    res.status(rta.status).json(rta.response);
+    processResponse(req, res, cb.apply(this, values));
   };
 }
 
 function deleteMethod(fields, cb) {
   return function (req, res) {
-    const rta = cb(req.params.id);
-    res.status(rta.status).json(rta.response);
+    processResponse(req, res, cb(req.params.id));
   };
 }
 
@@ -69,8 +82,8 @@ Jack.prototype.addResource = function Jack_addResource(resource, fields, methods
   for (method in methods) {
     cb = methods[method];
     _url = '/' + resource;
-    if(method === 'delete') {
-      _url = '/' + resource+ '/:id';
+    if (method === 'delete') {
+      _url = '/' + resource + '/:id';
     }
     this.router[method](_url, mthdInvocation[method](fields, cb));
   }
