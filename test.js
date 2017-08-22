@@ -40,13 +40,12 @@ p.addResource('content', ['id', 'url'], {
       }
     };
   },
-  delete: function (data) {
-    console.log('call delete...', {id, url});
+  delete: function (id) {
+    console.log('call delete...', id);
     return {
       status: 202,
       response: {
-        id: data.id,
-        url: data.url,
+        id: id,
         sample: 'delete'
       }
     };
