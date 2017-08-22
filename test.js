@@ -17,7 +17,7 @@ p.addResource('content', ['id', 'url'], {
     return r;
   },
   post: function (data) {
-    console.log('call post...', {id, url});
+    console.log('call post...', data);
     return {
       status: 201,
       response: {
@@ -28,7 +28,7 @@ p.addResource('content', ['id', 'url'], {
     };
   },
   put: function (filter, data) {
-    console.log('call put...', {id, url});
+    console.log('call put...', data);
     return {
       status: 202,
       response: {
@@ -51,7 +51,7 @@ p.addResource('content', ['id', 'url'], {
     };
   },
   patch: function (data) {
-    console.log('call patch...', {id, url});
+    console.log('call patch...', data);
     return {
       status: 202,
       response: {
