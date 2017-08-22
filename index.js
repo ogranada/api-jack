@@ -30,37 +30,54 @@ function processResponse(req, res, rta) {
         res.status(500).json({ message: error.message });
       })
       ;
-  } else if (typeof rta === 'function') {
+  } else if (typeof rta === 'object') {
     res.status(rta.status).json(rta.response);
   }
 }
 
 function getMethod(fields, cb) {
-  return function (req, res) {
-    let values = [], idx, field;
-    for (idx in fields) {
-      field = fields[idx];
-      values[values.length] = req.query[field];
-    }
-    processResponse(req, res, cb.apply(this, values));
-  };
+  return (function (req, res) {
+    let values = {};
+    fields.forEach((field) => {
+      if(req.query[field]){
+        values[field] = req.query[field];
+      }
+    }, this);
+    processResponse(req, res, cb.apply(this, [values]));
+  }).bind({ fields: fields });
 }
 
 function postMethod(fields, cb) {
-  return function (req, res) {
-    let values = [], idx, field;
-    for (idx in fields) {
-      field = fields[idx];
-      values[values.length] = req.body[field];
-    }
-    processResponse(req, res, cb.apply(this, values));
-  };
+  return (function (req, res) {
+    let values = {};
+    fields.forEach((field) => {
+      if(req.body[field]){
+        values[field] = req.body[field];
+      }
+    }, this);
+    processResponse(req, res, cb.apply(this, [values]));
+  }).bind({ fields: fields });
+}
+
+function putMethod(fields, cb) {
+  return (function (req, res) {
+    let values = {}, filter = {};
+    fields.forEach((field) => {
+      if(req.query[field]){
+        filter[field] = req.query[field];
+      }
+      if(req.body[field]){
+        values[field] = req.body[field];
+      }
+    }, this);
+    processResponse(req, res, cb.apply(this, [filter, values]));
+  }).bind({ fields: fields });
 }
 
 function deleteMethod(fields, cb) {
-  return function (req, res) {
+  return (function (req, res) {
     processResponse(req, res, cb(req.params.id));
-  };
+  }).bind({ fields: fields });
 }
 
 Jack.prototype.addResource = function Jack_addResource(resource, fields, methods) {
@@ -74,8 +91,8 @@ Jack.prototype.addResource = function Jack_addResource(resource, fields, methods
   let mthdInvocation = {
     get: getMethod,
     post: postMethod,
-    put: postMethod,
-    patch: postMethod,
+    put: putMethod,
+    patch: putMethod,
     delete: deleteMethod
   };
   let _url;
