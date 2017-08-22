@@ -5,7 +5,7 @@ p = new Jack({
   name: 'sampleServer'
 });
 p.addResource('content', ['id', 'url'], {
-  get: function (data) {
+  get: function*(data) {
     let r = {
       status: 200,
       response: {

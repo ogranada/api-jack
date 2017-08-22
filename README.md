@@ -15,57 +15,57 @@ p = new Jack({
 
 p.addResource('content', ['id', 'url'], {
   // you can implement GET, POST, PUT, DELETE and PATCH to comunicate your microservicess passing information accross them.
-  get: function*(id, url) { // you can use a generator or a simple function
-    console.log('call get...');
+  get: function*(data) { // you can use a generator or a simple function
+    console.log('call get...', data);
     return {  // you should return an object with status code and response value
       status: 200,
       response: {
-        id: id,
-        url: url,
+        id: data.id,
+        url: data.url,
         sample: 'get'
       }
     };
   },
-  post: function (id, url) {
-    console.log('call post...', {id, url});
+  post: function (data) {
+    console.log('call post...', data);
     return {
       status: 201,
       response: {
-        id: id,
-        url: url,
+        id: data.id,
+        url: data.url,
         sample: 'post'
       }
     };
   },
-  put: function (id, url) {
-    console.log('call put...', {id, url});
+  put: function (data) {
+    console.log('call put...', data);
     return {
       status: 202,
       response: {
-        id: id,
-        url: url,
+        id: data.id,
+        url: data.url,
         sample: 'put'
       }
     };
   },
-  delete: function (id, url) {
-    console.log('call delete...', {id, url});
+  delete: function (data) {
+    console.log('call delete...', data);
     return {
       status: 202,
       response: {
-        id: id,
-        url: url,
+        id: data.id,
+        url: data.url,
         sample: 'delete'
       }
     };
   },
-  patch: function (id, url) {
-    console.log('call patch...', {id, url});
+  patch: function (data) {
+    console.log('call patch...', data);
     return {
       status: 202,
       response: {
-        id: id,
-        url: url,
+        id: data.id,
+        url: data.url,
         sample: 'patch'
       }
     };
