@@ -119,12 +119,10 @@ Jack.prototype.addResource = function Jack_addResource(resource, fields, methods
     cb = methods[method];
     _url = '/' + resource;
     if ('get post'.split(' ').indexOf(method) > -1) {
-      global.console.log('jack URL(%s): %s', method, _url);
       this.router[method](_url, mthdInvocation[method](fields, cb));
     }
     if ('get put patch delete'.split(' ').indexOf(method) > -1) {
       _url = '/' + resource + '/:id';
-      global.console.log('jack URL(%s): %s', method, _url);
       this.router[method](_url, mthdInvocation[method](fields, cb));
     }
   }
