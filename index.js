@@ -47,7 +47,7 @@ function getMethod(fields, cb) {
   }).bind({ fields: fields });
 }
 
-function processData(req) {
+function processData(req, fields) {
   let values = {};
   if(Array.isArray(req.body)) {
     let body = req.body;
@@ -73,7 +73,7 @@ function processData(req) {
 
 function postMethod(fields, cb) {
   return (function (req, res) {
-    let values = processData(req);
+    let values = processData(req, fields);
     processResponse(req, res, cb.apply(this, [values]));
   }).bind({ fields: fields });
 }
@@ -118,10 +118,15 @@ Jack.prototype.addResource = function Jack_addResource(resource, fields, methods
   for (method in methods) {
     cb = methods[method];
     _url = '/' + resource;
-    if ('post put patch delete'.split(' ').indexOf(method) > -1) {
-      _url = '/' + resource + '/:id';
+    if ('get post'.split(' ').indexOf(method) > -1) {
+      global.console.log('jack URL(%s): %s', method, _url);
+      this.router[method](_url, mthdInvocation[method](fields, cb));
     }
-    this.router[method](_url, mthdInvocation[method](fields, cb));
+    if ('get put patch delete'.split(' ').indexOf(method) > -1) {
+      _url = '/' + resource + '/:id';
+      global.console.log('jack URL(%s): %s', method, _url);
+      this.router[method](_url, mthdInvocation[method](fields, cb));
+    }
   }
 }
 
