@@ -39,7 +39,7 @@ function getMethod(fields, cb) {
   return (function (req, res) {
     let values = {};
     fields.forEach((field) => {
-      if(req.query[field]){
+      if (req.query[field]) {
         values[field] = req.query[field];
       }
     }, this);
@@ -47,26 +47,45 @@ function getMethod(fields, cb) {
   }).bind({ fields: fields });
 }
 
-function postMethod(fields, cb) {
-  return (function (req, res) {
-    let values = {};
+function processData(req) {
+  let values = {};
+  if(Array.isArray(req.body)) {
+    let body = req.body;
+    values = [];
+    for(let elm of body) {
+      let itervalue = {};
+      fields.forEach((field) => {
+        if(elm[field]){
+          itervalue[field] = elm[field];
+        }
+      }, this);
+      values.push(itervalue);
+    }
+  } else {
     fields.forEach((field) => {
       if(req.body[field]){
         values[field] = req.body[field];
       }
     }, this);
+  }
+  return values;
+}
+
+function postMethod(fields, cb) {
+  return (function (req, res) {
+    let values = processData(req);
     processResponse(req, res, cb.apply(this, [values]));
   }).bind({ fields: fields });
 }
 
 function putMethod(fields, cb) {
   return (function (req, res) {
-    let values = {}, filter = {};
+    let values = {}, filter = { _id: fields.id };
     fields.forEach((field) => {
-      if(req.query[field]){
+      if (req.query[field]) {
         filter[field] = req.query[field];
       }
-      if(req.body[field]){
+      if (req.body[field]) {
         values[field] = req.body[field];
       }
     }, this);
@@ -99,7 +118,7 @@ Jack.prototype.addResource = function Jack_addResource(resource, fields, methods
   for (method in methods) {
     cb = methods[method];
     _url = '/' + resource;
-    if (method === 'delete') {
+    if ('post put patch delete'.split(' ').indexOf(method) > -1) {
       _url = '/' + resource + '/:id';
     }
     this.router[method](_url, mthdInvocation[method](fields, cb));
