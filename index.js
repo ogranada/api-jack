@@ -43,7 +43,7 @@ function getMethod(fields, cb) {
         values[field] = req.query[field];
       }
     }, this);
-    processResponse(req, res, cb.apply(this, [values]));
+    processResponse(req, res, cb.apply(this, [req.params.id, values]));
   }).bind({ fields: fields });
 }
 
