@@ -80,7 +80,7 @@ function postMethod(fields, cb) {
 
 function putMethod(fields, cb) {
   return (function (req, res) {
-    let values = {}, filter = { _id: fields.id };
+    let values = {}, filter = { _id: req.params.id };
     fields.forEach((field) => {
       if (req.query[field]) {
         filter[field] = req.query[field];
